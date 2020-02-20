@@ -9,6 +9,7 @@ pub struct Library {
     pub nb_book: usize,
     pub signup_duration: usize,
     pub book_throughput: usize,
+    pub id: usize,
 }
 
 impl Library {
@@ -17,17 +18,20 @@ impl Library {
         nb_book: usize,
         signup_duration: usize,
         book_throughput: usize,
+        id: usize,
     ) -> Self {
         Self {
             books,
             nb_book,
             signup_duration,
             book_throughput,
+            id,
         }
     }
 
     pub fn parse(
         reader: &mut std::io::Lines<std::io::BufReader<std::io::Stdin>>,
+        id: usize,
     ) -> Result<Self, Error> {
         let tmp = reader.next().unwrap()?;
 
@@ -44,7 +48,27 @@ impl Library {
             .map(|idx| idx.parse())
             .collect::<Result<_, _>>()?;
 
-        Ok(Self::from(books, nb_book, signup_duration, book_throughput))
+        Ok(Self::from(
+            books,
+            nb_book,
+            signup_duration,
+            book_throughput,
+            id,
+        ))
+    }
+
+    pub fn score(&self) -> usize {
+        self.books.iter().sum()
+    }
+}
+
+impl std::fmt::Display for Library {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{} {}", self.id, self.nb_book)?;
+        for book in &self.books {
+            write!(f, "{} ", book)?;
+        }
+        writeln!(f)
     }
 }
 
@@ -71,7 +95,7 @@ pub fn parse() -> Result<(usize, usize, usize, Vec<usize>, Vec<Library>), Error>
     let scores = tmp.map(|id| id.parse()).collect::<Result<_, _>>()?;
 
     let lib = (0..nb_library)
-        .map(|_| Library::parse(&mut reader))
+        .map(|id| Library::parse(&mut reader, id))
         .collect::<Result<_, _>>()?;
 
     Ok((nb_book, nb_library, nb_days, scores, lib))

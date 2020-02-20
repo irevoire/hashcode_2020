@@ -3,24 +3,16 @@
 
 fn main() {
     let (nb_book, nb_library, nb_days, mut scores, mut library) = books::parse().unwrap();
+    // let mut order = Vec::new();
 
-    dbg!(nb_book);
-    dbg!(library);
-
-    /*
-    for p in pizza {
-        if cpt + p.nb < max_slice {
-            cpt += p.nb;
-            used.push(p.clone());
-        }
+    for lib in library.iter_mut() {
+        lib.books.sort_unstable_by_key(|el| scores[*el]);
     }
 
-    used.reverse();
+    library.sort_unstable_by_key(|lib| lib.score());
 
-    println!("{}", used.len());
-    for p in used {
-        print!("{} ", p.id);
+    println!("{}", nb_library);
+    for lib in library {
+        print!("{}", lib);
     }
-    println!();
-    */
 }
