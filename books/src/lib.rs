@@ -65,26 +65,17 @@ impl Library {
         if self.signup_duration > days {
             return (0, Vec::new());
         }
-        let mut rem = days - self.signup_duration;
-        let mut score = 0;
-        let mut book = Vec::new();
-        let mut book_iter = self.books.iter();
+        let rem = days - self.signup_duration;
 
-        while rem > 0 {
-            let mut done = 0;
-            for &b in &mut book_iter {
-                if used[b] {
-                    continue;
-                }
-                book.push(b);
-                score += scores[b];
-                done += 1;
-                if done == self.book_throughput {
-                    break;
-                }
-            }
-            rem -= 1;
-        }
+        let book: Vec<usize> = self
+            .books
+            .iter()
+            .filter(|&b| !used[*b])
+            .take(rem * self.book_throughput)
+            .map(|e| *e)
+            .collect();
+
+        let score = book.iter().map(|b| scores[*b]).sum();
 
         (score, book)
     }
