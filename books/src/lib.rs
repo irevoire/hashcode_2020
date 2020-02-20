@@ -60,6 +60,34 @@ impl Library {
     pub fn score(&self) -> usize {
         self.books.iter().sum()
     }
+
+    pub fn scan_book(&self, days: usize, used: &[bool], scores: &[usize]) -> (usize, Vec<usize>) {
+        if self.signup_duration > days {
+            return (0, Vec::new());
+        }
+        let mut rem = days - self.signup_duration;
+        let mut score = 0;
+        let mut book = Vec::new();
+        let mut book_iter = self.books.iter();
+
+        while rem > 0 {
+            let mut done = 0;
+            for &b in &mut book_iter {
+                if used[b] {
+                    continue;
+                }
+                book.push(b);
+                score += scores[b];
+                done += 1;
+                if done == self.book_throughput {
+                    break;
+                }
+            }
+            rem -= 1;
+        }
+
+        (score, book)
+    }
 }
 
 impl std::fmt::Display for Library {
